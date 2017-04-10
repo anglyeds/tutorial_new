@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+	<title>Login</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="lib/jquery-1.11.3.js" type="text/javascript"></script>
+	<script src="lib/json2.js" type="text/javascript"></script>
+	
+	
+<style>
+
+.center {	
+    text-align: center; 
+	padding: 1em
+}
+
+.button {
+	border-radius: 5px;
+	background-color: #dedede;	//#4CAF50;
+	height: 100px;
+	//width: 200px;
+    border:1px solid grey;
+    color: black;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.button:hover{
+     background: #45a999;
+}
+
+input[type=text] {
+    width: 60%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    width: 60%;
+    background-color: #4CAF50;
+    color: white;
+	font-size: 16px;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #45a999;
+}
+
+#loginBG {
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.hide{display:none;}
+
+.loadingLogo{
+	background: url(Logo.png) no-repeat center;
+	background-size: contain;
+	-webkit-background-size: contain;
+	height: 100px; 
+	margin: 50px auto 50px;	
+	width: auto;
+}
+
+table {
+    //width: 80%;
+    border-collapse: collapse;
+	margin-left: auto;
+    margin-right: auto;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="loadingLogo"> </div>
+
+<!--
+<div class ="center">
+	<table>
+		<tr>
+		<th><button id="user" class="button disabled" disabled>User Management</button></th>
+		<th><button id="store" class="button disabled" disabled>Store Management</button></th>
+		<th><button id="jobsheet" class="button disabled" disabled>Job Sheet Creation</button></th>
+		<th><button id="deployment" class="button disabled" disabled>Planning/Deployment Sheet</button></th>
+		<th><button id="period" class="button disabled" disabled>Period Management</button></th>
+		<th><button id="showPeriod" class="button disabled" disabled>Set Period Shown in App</button></th>
+		</tr>
+	</table>
+</div>
+-->
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div class="center">
+   <form id="form" method="POST" >
+	<h3>Only registered SMA's staff are authorized to Login</h3>  
+    <input type="text" id="loginId" name="loginId" placeholder="Login ID" ><br>  
+    <input type="text" id="password" name="password" placeholder="Password" ><br>
+	<!--<input type="submit" id="loginBtn" value="Login">-->
+	</form>
+	<button id="loginBtn" class="button" style="height:50px">Login</button>
+	
+</form>
+</div> 
+
+<div id="msg" class="center"></div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class='center'>©Synergy Marketing (Asia) Ltd 2016. All Rights Reserved.
+<a href="version.php" style="font-size:14px; color:#009900; text-decoration:none; ">  Version:0.001</a>
+</div>
+<script>
+
+if (sessionStorage.getItem("isLogin") === "success") {
+
+	$("#loginBtn").addClass('disabled');
+	$('#user').removeClass('disabled');
+	$('#user').removeAttr('disabled');				
+	$('#store').removeClass('disabled');
+	$('#store').removeAttr('disabled');				
+	$('#jobsheet').removeClass('disabled');
+	$('#jobsheet').removeAttr('disabled');
+	$('#deployment').removeClass('disabled');
+	$('#deployment').removeAttr('disabled');
+	$('#period').removeClass('disabled');
+	$('#period').removeAttr('disabled');
+	$('#showPeriod').removeClass('disabled');
+	$('#showPeriod').removeAttr('disabled');
+}
+
+$('#password').keydown(function (e){
+
+    if(e.keyCode == 13){
+       login();
+    }
+})
+
+$('#loginBtn').click(function() {
+	
+	login();
+});
+
+function login() {
+
+	var loginid = $("#loginId").val();	
+	var pwd = $("#password").val();	
+	
+	if (loginid==='' || pwd==='')
+	{
+		$("#msg").text("Please enter Login ID and Password.").css("color", "red");
+		return false;
+	}
+	/*
+	//check if the first char is uppercase
+	else if (loginid[0].toUpperCase() != loginid[0])
+	{
+		$("#msg").text("Invalid Login ID, please try again.").css("color", "red");
+		console.log('First character is not upper case.'); 
+		return false;
+	}
+	*/
+	console.log(loginid+', '+pwd);
+	var data = {"loginId":loginid, "password":pwd};
+	
+    $.ajax({
+		type:"POST",
+		dataType: "json",
+		url: "getLogin.php",
+        data:data,
+        success: function(response) {
+			
+			 console.log(response);
+			 
+             if (response.status === "success") {
+               				
+				sessionStorage.setItem("isLogin", response.status);
+				sessionStorage.setItem("token", response.token);
+				/* 
+				$("#loginBtn").addClass('disabled');
+				$("#msg").text("Login succeeded.").css("color", "black");
+				$('#user').removeClass('disabled');
+				$('#user').removeAttr('disabled');				
+				$('#store').removeClass('disabled');
+				$('#store').removeAttr('disabled');				
+				$('#jobsheet').removeClass('disabled');
+				$('#jobsheet').removeAttr('disabled');
+				$('#deployment').removeClass('disabled');
+				$('#deployment').removeAttr('disabled');
+				$('#period').removeClass('disabled');
+				$('#period').removeAttr('disabled');
+				$('#showPeriod').removeClass('disabled');
+				$('#showPeriod').removeAttr('disabled');
+				*/
+				
+				window.location.replace('main.html');
+             } else if (response.status === "unauthroized") {
+				$("#msg").text("Your Login ID is not authorized to access.").css("color", "red");
+             } else {
+				$("#msg").text("Invalid Login ID or Password, please try again.").css("color", "red");
+             }
+        },
+		error:function (jqXHR, textStatus, errorThrown) {
+			console.log('Error! textStatus' + ': ' + errorThrown);            
+        }
+    });
+}
+
+$('#user').click(function() {
+	console.log("click user");
+	window.location.replace('userManagement.php');
+});
+
+$('#store').click(function() {
+	console.log("click store");
+	window.location.replace('storeManagement.php');
+});
+
+$('#jobsheet').click(function() {
+	console.log("click jobsheet");
+	window.location.replace('jobSheet.php');
+});
+
+$('#deployment').click(function() {
+	console.log("click deployment");
+	window.location.replace('deploymentSheet.php');
+});
+
+$('#period').click(function() {
+	console.log("click period");
+	window.location.replace('periodManagement.php');
+});
+
+$('#showPeriod').click(function() {
+	console.log("click showPeriod");
+	window.location.replace('showPeriodInApps.php');
+});
+
+</script>
+
+
+</body>
+</html> 
